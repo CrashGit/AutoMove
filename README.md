@@ -48,4 +48,4 @@ For keys that are more game-specific, pass the keys as an argument when assignin
 
 In the above example, in addition to the keys in `default_keys`, `Tab` and `m` (commonly used to open inventory and map) also stop automovement.
 
-If you've never used inputhook before, it's important to note that any keys with a left and right variant, you must specify which one (or both) that you want to use. For example, `{Ctrl}` will not work like with other functions that accept keys like Send, but `{LCtrl}` and `{RCtrl}` will.
+If you've never used inputhook before, it's important to note that for any keys with a left and right variant, you must specify which one (or both) that you want to use. For example, `{Ctrl}` will not work even though it works fine for functions that accept keys like Send, but `{LCtrl}` and `{RCtrl}` will.
