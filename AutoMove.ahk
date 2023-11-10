@@ -6,7 +6,7 @@
 ; This function isn't necessary for the script, but is useful for games in general.
 ; Prevents possible issues that can be caused by AHK releasing and pressing modifiers again
 ; For example, setting up q to be quick swap(swap weapons 1 and 2) in Deep Rock Galactic can cause
-; the double-tap sprint to dash ability without {Blind} when sprinting and double-tapping q
+; the double-tap sprint to dash ability to trigger without {Blind}, when sprinting and double-tapping q
 GameSend(keys) => SendEvent('{Blind}' keys)
 
 
