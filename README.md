@@ -1,7 +1,6 @@
 # AutoMove
 Auto walk/sprint in games.
 
-Edit: After some testing, I realized this only works with mouse buttons reliably. Using the hold hotkey to sprint is inconsistent with keyboard keys because of auto-repeat. I've tried KeyWait in every imaginable way but for some reason the hotkey becomes unresponsive until the inputhook stops.
 
 ## What is the scope of this script?
 
