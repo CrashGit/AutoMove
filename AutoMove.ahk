@@ -22,9 +22,10 @@ GameSend(keys) => SendEvent('{Blind}' keys)
 AutoMove(deactivate_keys := '', forward := 'w', sprint := 'LShift')
 {
     ; useful when there are certain keys you always want to stop the inputhook
-    static ih := InputHook('V I1')                                      ; initialize InputHook
-    static default_keys := 'ws{Esc}{LAlt}'                              ; default keys to always end AutoMove inputhook
+    static ih := InputHook('V'),                                        ; initialize InputHook
+        default_keys := 'ws{Esc}{LAlt}'                                 ; default keys to always end AutoMove inputhook
     sprinting := GetKeyState(sprint, 'P')                               ; check if holding sprint key when pressed
+    ThisHotkey := Key()
 
     switch ih.InProgress
     {
@@ -34,7 +35,7 @@ AutoMove(deactivate_keys := '', forward := 'w', sprint := 'LShift')
                 SetTimer(SetupInputHook, -1)                            ; start AutoMove again
             } else {                                                    ; if not sprinting
                 ih.Stop()                                               ; stop AutoMove
-                if sprinting := !KeyWait(Key(), 'T0.3')                 ; check if holding AutoMove hotkey to trigger sprint without need to hold sprint key
+                if sprinting := !KeyWait(ThisHotkey, 'T0.3')            ; check if holding AutoMove hotkey to trigger sprint without need to hold sprint key
                     SetTimer(SetupInputHook, -1)                        ; restart input gathering
                 else                                                    ; if not sprinting
                     ResetKeys()                                         ; reset keys held down
@@ -44,6 +45,7 @@ AutoMove(deactivate_keys := '', forward := 'w', sprint := 'LShift')
             SetTimer(SetupInputHook, -1)                                ; start AutoMove
     }
 
+    KeyWait(ThisHotkey)                                                 ; prevent extra key repeats
 
     SetupInputHook()
     {
@@ -53,17 +55,15 @@ AutoMove(deactivate_keys := '', forward := 'w', sprint := 'LShift')
         GameSend('{' forward ' down}')                                  ; hold down forward when w is physically released
 
         if not sprinting                                                ; if sprint wasn't held
-            sprinting := !KeyWait(Key(), 'T0.3')                        ; check if holding AutoMove hotkey to trigger sprint without need to hold sprint key
+            sprinting := !KeyWait(ThisHotkey, 'T0.3')                   ; check if holding AutoMove hotkey to trigger sprint without need to hold sprint key
 
         if sprinting                                                    ; if sprinting
             if KeyWait(sprint, 'T0.5')                                  ; and sprint key is released within 0.5 seconds (if held)
                 GameSend('{' sprint ' down}')                           ; hold down sprint
 
         ih.KeyOpt(default_keys deactivate_keys, 'E')                    ; keys list ends AutoMove
+        ih.OnEnd := (*) => (ih.EndReason = 'EndKey') ? ResetKeys() : 0  ; on end, if endreason is an endkey was used, reset keys
         ih.Start()                                                      ; start collecting input
-        ih.Wait()                                                       ; wait until done before continuing
-        if ih.EndReason = 'EndKey'                                      ; only if AutoMove was stopped by natural causes (EndKey)
-            ResetKeys()                                                 ; reset keys held down to stop AutoMove
     }
 
 
@@ -73,13 +73,5 @@ AutoMove(deactivate_keys := '', forward := 'w', sprint := 'LShift')
     }
 
     ; strips hotkey of modifiers
-    Key(hotkey := A_ThisHotkey)
-    {
-        modifiers := ['~', '*', '$', '!', '^',      ; symbols to strip from hotkey
-                    '+', '#', '<', '>', ' ']
-        for modifier in modifiers                   ; for each modifier
-            hotkey := StrReplace(hotkey, modifier)  ; remove modifier
-
-        return hotkey
-    }
+    Key(ThisHotkey := A_ThisHotkey) => RegExReplace(ThisHotkey, '[~*$!^+#<>]')
 }
